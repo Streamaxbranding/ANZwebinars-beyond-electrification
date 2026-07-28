@@ -2113,7 +2113,7 @@ gap: 10px;
 <div class="time-card"><small>Perth</small><b>1:00–2:00 PM</b></div>
 <div class="time-card"><small>New Zealand</small><b>5:00–6:00 PM</b></div>
 </div>
-<div class="btns"><a class="btn-metal" href="https://events.zoom.us/ev/AovTq7IPMNA2j5K4i42wE5ZAnL-oABbB9B_LvFSDUGPDEkwVlM_-~AnJ-Xji2FCpMH8-m097NNHdWX81vGwZgrrW_06N0fH9tdFeDsON8uDMIYw">Register for the Webinar</a><a class="btn-metal" href="#agenda">View Agenda</a></div>
+<div class="btns"><a class="btn-metal" href="https://events.zoom.us/ev/AovTq7IPMNA2j5K4i42wE5ZAnL-oABbB9B_LvFSDUGPDEkwVlM_-~Aifmcqa-OOFRTWeqZlilVeWP3_WfDE_sJK-lrevFVUh9NF8CdaBfNsAeD-aKmGpX_5pvt0aBUyw-vXmIiArN08asLQ">Register for the Webinar</a><a class="btn-metal" href="#agenda">View Agenda</a></div>
 </div>
 </div>
 <div class="hero-cue">Scroll to reveal the webinar details</div><div class="section-index">01 / 10</div>
@@ -2272,7 +2272,7 @@ gap: 10px;
 <section class="screen" id="register">
 <div class="cta-bg"><img alt="Electric bus driving at golden hour" data-asset="img5" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="/></div>
 <div class="frame-inner"><div class="content cta-center" data-reveal="">
-<div class="eyebrow">Join the Webinar</div><h2 class="title">Start with one real operational challenge.</h2><p class="lead">Explore practical lessons from Chongqing and Singapore—and find the right starting point for ANZ.</p><div class="btns"><a class="btn-metal" href="https://events.zoom.us/ev/AovTq7IPMNA2j5K4i42wE5ZAnL-oABbB9B_LvFSDUGPDEkwVlM_-~AnJ-Xji2FCpMH8-m097NNHdWX81vGwZgrrW_06N0fH9tdFeDsON8uDMIYw">Register via Zoom</a><a class="btn-metal" href="#hero">Back to Top</a></div><p class="cta-note">You will be redirected to Zoom to complete your registration and receive access details.</p>
+<div class="eyebrow">Join the Webinar</div><h2 class="title">Start with one real operational challenge.</h2><p class="lead">Explore practical lessons from Chongqing and Singapore—and find the right starting point for ANZ.</p><div class="btns"><a class="btn-metal" href="https://events.zoom.us/ev/AovTq7IPMNA2j5K4i42wE5ZAnL-oABbB9B_LvFSDUGPDEkwVlM_-~Aifmcqa-OOFRTWeqZlilVeWP3_WfDE_sJK-lrevFVUh9NF8CdaBfNsAeD-aKmGpX_5pvt0aBUyw-vXmIiArN08asLQ">Register via Zoom</a><a class="btn-metal" href="#hero">Back to Top</a></div><p class="cta-note">You will be redirected to Zoom to complete your registration and receive access details.</p>
 </div></div><div class="section-index">10 / 10</div>
 </section>
 </main>
@@ -2510,74 +2510,28 @@ addEventListener('scroll',update,{passive:true});addEventListener('resize',updat
 })();
 </script>
 
-<script id="anz-webinar-utm-forwarding-v1">
+<script id="anz-webinar-utm-forwarding-v2">
 (function () {
   'use strict';
 
-  const UTM_KEYS = [
-    'utm_source',
-    'utm_medium',
-    'utm_campaign'
-  ];
+  const FIXED_UTM = Object.freeze({
+    utm_source: 'linkedin',
+    utm_medium: 'paid-social',
+    utm_campaign: '2026 ANZ Campaign Group'
+  });
+  const UTM_KEYS = Object.keys(FIXED_UTM);
 
-  function getUtmFromUrl() {
-    const params = new URLSearchParams(window.location.search);
-    const utm = {};
-
-    UTM_KEYS.forEach(function (key) {
-      const value = params.get(key);
-
-      if (typeof value === 'string' && value.trim() !== '') {
-        utm[key] = value.trim();
-      }
-    });
-
-    return utm;
-  }
-
-  function saveUtm(utm) {
+  function saveFixedUtm() {
     try {
       localStorage.removeItem('anz_webinar_utm');
 
       UTM_KEYS.forEach(function (key) {
         localStorage.removeItem(key);
-      });
-
-      Object.keys(utm).forEach(function (key) {
-        localStorage.setItem(key, utm[key]);
+        localStorage.setItem(key, FIXED_UTM[key]);
       });
     } catch (error) {
       // localStorage 不可用时，不中断页面功能。
     }
-  }
-
-  function getStoredUtm() {
-    const utm = {};
-
-    try {
-      UTM_KEYS.forEach(function (key) {
-        const value = localStorage.getItem(key);
-
-        if (typeof value === 'string' && value.trim() !== '') {
-          utm[key] = value.trim();
-        }
-      });
-    } catch (error) {
-      return {};
-    }
-
-    return utm;
-  }
-
-  function getActiveUtm() {
-    const currentUtm = getUtmFromUrl();
-
-    if (Object.keys(currentUtm).length > 0) {
-      saveUtm(currentUtm);
-      return currentUtm;
-    }
-
-    return getStoredUtm();
   }
 
   function isStreamaxHostname(hostname) {
@@ -2635,20 +2589,15 @@ addEventListener('scroll',update,{passive:true});addEventListener('resize',updat
       return;
     }
 
-    let changed = false;
-
     UTM_KEYS.forEach(function (key) {
       const value = activeUtm[key];
 
-      if (value && !targetUrl.searchParams.has(key)) {
+      if (targetUrl.searchParams.get(key) !== value) {
         targetUrl.searchParams.set(key, value);
-        changed = true;
       }
     });
 
-    if (changed) {
-      link.setAttribute('href', targetUrl.toString());
-    }
+    link.setAttribute('href', targetUrl.toString());
   }
 
   function decorateLinks(root, activeUtm) {
@@ -2662,11 +2611,8 @@ addEventListener('scroll',update,{passive:true});addEventListener('resize',updat
     });
   }
 
-  const activeUtm = getActiveUtm();
-
-  if (Object.keys(activeUtm).length === 0) {
-    return;
-  }
+  saveFixedUtm();
+  const activeUtm = FIXED_UTM;
 
   decorateLinks(document, activeUtm);
 
