@@ -1916,6 +1916,21 @@ gap: 10px;
 }
 
 @media (max-width:700px){
+  #hero .event-phase .btns{
+    width:100%!important;
+    margin-top:18px!important;
+    gap:8px!important;
+    flex-wrap:nowrap!important;
+  }
+  #hero .event-phase .btn-metal{
+    flex:1 1 0!important;
+    width:auto!important;
+    min-width:0!important;
+    height:46px!important;
+    padding:0 5px!important;
+    white-space:nowrap!important;
+    font-size:clamp(9px,2.8vw,12px)!important;
+  }
   #challenge .split{gap:30px!important}
   #challenge .visual-switch{height:clamp(300px,52svh,440px)!important;min-height:300px!important}
   #anz .anz-cards{grid-template-columns:1fr!important;gap:12px!important}
@@ -2510,7 +2525,7 @@ addEventListener('scroll',update,{passive:true});addEventListener('resize',updat
 })();
 </script>
 
-<script id="anz-webinar-utm-forwarding-v2">
+<script id="anz-webinar-utm-forwarding-v3">
 (function () {
   'use strict';
 
@@ -2521,7 +2536,7 @@ addEventListener('scroll',update,{passive:true});addEventListener('resize',updat
   });
   const UTM_KEYS = Object.keys(FIXED_UTM);
 
-  function saveFixedUtm() {
+  function saveFixedUtmToLocalStorage() {
     try {
       localStorage.removeItem('anz_webinar_utm');
 
@@ -2530,7 +2545,20 @@ addEventListener('scroll',update,{passive:true});addEventListener('resize',updat
         localStorage.setItem(key, FIXED_UTM[key]);
       });
     } catch (error) {
-      // localStorage 不可用时，不中断页面功能。
+      // localStorage 不可用时，不影响 sessionStorage 或链接跳转。
+    }
+  }
+
+  function saveFixedUtmToSessionStorage() {
+    try {
+      sessionStorage.removeItem('anz_webinar_utm');
+
+      UTM_KEYS.forEach(function (key) {
+        sessionStorage.removeItem(key);
+        sessionStorage.setItem(key, FIXED_UTM[key]);
+      });
+    } catch (error) {
+      // sessionStorage 不可用时，不影响 localStorage 或链接跳转。
     }
   }
 
@@ -2611,7 +2639,8 @@ addEventListener('scroll',update,{passive:true});addEventListener('resize',updat
     });
   }
 
-  saveFixedUtm();
+  saveFixedUtmToLocalStorage();
+  saveFixedUtmToSessionStorage();
   const activeUtm = FIXED_UTM;
 
   decorateLinks(document, activeUtm);
