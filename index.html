@@ -2431,6 +2431,62 @@ function update(){
 addEventListener('scroll',update,{passive:true});addEventListener('resize',update);update();
 </script>
 
+<script id="anz-hero-auto-event-2s">
+(() => {
+  const hero = document.getElementById('hero');
+  if (!hero) return;
+
+  const AUTO_DELAY = 2000;
+  const EVENT_PROGRESS = 0.56;
+  let timer = 0;
+  let scheduled = false;
+
+  /* A refresh normally restores the previous scroll position. Disable that so
+     every fresh page load starts with the opening Hero state. */
+  if ('scrollRestoration' in window.history) {
+    window.history.scrollRestoration = 'manual';
+  }
+
+  const resetToHeroStart = () => {
+    if (window.location.hash) return;
+    const root = document.documentElement;
+    const previousBehavior = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    window.scrollTo(0, 0);
+    root.style.scrollBehavior = previousBehavior;
+  };
+
+  const scheduleAutoAdvance = () => {
+    if (scheduled) return;
+    scheduled = true;
+    resetToHeroStart();
+
+    timer = window.setTimeout(() => {
+      /* Do not pull the visitor back if they have already started scrolling. */
+      if (window.scrollY > 4) return;
+
+      const scrollable = Math.max(0, hero.offsetHeight - window.innerHeight);
+      const targetY = hero.offsetTop + scrollable * EVENT_PROGRESS;
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      window.scrollTo({
+        top: targetY,
+        behavior: reducedMotion ? 'auto' : 'smooth'
+      });
+    }, AUTO_DELAY);
+  };
+
+  resetToHeroStart();
+  if (document.readyState === 'complete') {
+    scheduleAutoAdvance();
+  } else {
+    window.addEventListener('load', scheduleAutoAdvance, {once:true});
+    window.addEventListener('pageshow', scheduleAutoAdvance, {once:true});
+  }
+  window.addEventListener('pagehide', () => window.clearTimeout(timer), {once:true});
+})();
+</script>
+
 <script id="streamax-imported-header-js">
 (() => {
   const header = document.getElementById('streamaxHeader');
